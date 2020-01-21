@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ page.title }}</title>
+    <link href="/assets/mongly/css/main.css" rel="stylesheet" type="text/css">
+    {% for font in page.fonts %}
+      <link href="http://fonts.googleapis.com/css?family={{ font }}" rel="stylesheet" type="text/css">
+    {% endfor %}
+    {% if page.css %}<link href="/assets/mongly/css/{{page.css}}.css" rel="stylesheet" type="text/css">{% endif %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="/assets/js/main.js"></script>
+    {% if page.multi %}<script src="/assets/mongly/js/multi.js"></script>{% endif %}
+    {% if page.js %}<script src="/assets/mongly/js/{{ page.js }}.js"></script>{% endif %}
+  </head>
+  <body{% if page.theme %} class="{{ page.theme }}"{% endif %}>
+    {% if page.url != '/mongly' %}<a href="/mongly" id="homeLink">home</a>{% endif %}
+    <div id="page">{{ content }}</div>
+  </body>
+</html>

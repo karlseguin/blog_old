@@ -1,0 +1,14 @@
+html,body,#page{height:100%;}
+h2{color:#444;margin:10px 0;}
+p{color:#666;margin:2px;width:450px}
+
+#page{font-family:'Varela Round',verdana;;}
+#left, #right{height:100%;float:left;padding:0 10px;}
+#left{width:50%;background:#e6e6e6;border-right:1px solid #999;}
+#left ul a, #right li a{display:block;padding:8px;border:1px solid transparent;border-radius:4px;}
+#left ul a:hover{background:#f3f3f3;text-decoration:none;border:1px solid #bbb;}
+
+#right {padding-left:20px;}
+#right ul a:hover{background:#f3f3f3;text-decoration:none;border:1px solid #bbb;}
+#github{color:#1756c3;margin:30px 0 0 275px;text-decoration:underline;display:inline-block;font-size:80%;}
+#footer{background:transparent;}
