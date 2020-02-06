@@ -49,3 +49,4 @@ tags: [learning]
 
 <p>There are a lot of CockrorachDB features we aren't using, like partition tables, content locality, replication zone, change data capture and so on. Conversely, there are a lot of PostgreSQL features that we weren't using, which might have been much harder to migrate away from. I do worry that we'll eventually get a complex requirement that PG (or one of its many extensions) could have helped us solve. But, with PostgreSQL I was worrying a lot more about how to detect a failure and failing over to standby.</p>
 
+<p><strong>update:</strong> I forgot to mention something important. The system that was migrated has solid tests and good coverage. While a lot of the differences we ran into are obvious (like lack of range types and triggers), others were more subtle (especially the odd on conflict behavior). Test coverage made a pretty significant impact in the speed of the migration and our confidence in pushing live.</p>
