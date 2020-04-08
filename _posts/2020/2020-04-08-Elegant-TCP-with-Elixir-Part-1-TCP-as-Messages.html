@@ -7,9 +7,9 @@ tags: [elixir]
 
 <p>Over the next few posts, I want to talk about some features of Elixir and how they can be leveraged to build simple (or complex) TCP socket code. I say "features of Elixir" but, as I've pointed out before, the beauty of the language is the synergy it has with its runtime and standard library. So, technically these aren't language features, but let's not get pedantic.</p>
 
-<p>While there's a new <a href="https://erlang.org/doc/man/socket.html">Socket module</a> which better aligns with traditional socket API ergonomics, I'm going to be sticking with the <a href="https://erlang.org/doc/man/gen_tcp.html">gen_tcp module</a>. </p>
+<p>While there's a new <a href="https://erlang.org/doc/man/socket.html">Socket module</a> which better aligns with traditional socket API ergonomics, I'm going to stick with then <a href="https://erlang.org/doc/man/gen_tcp.html">gen_tcp module</a>. </p>
 
-<p>The first feature is about receiving data from a socket. Normally, given a socket, you'd call the <code>recv</code> function to get data from the socket. Two common patterns are to issue a <code>recv</code> after a <code>send</code> as part of a request->reply, or to block on <code>recv</code>, process the incoming message, and then loop back to the blocking <code>recv</code> - handling messages as they come in.</p>
+<p>The first feature is about receiving data from a socket. Normally, given a socket, you'd call the <code>recv</code> function to get data from it. Two common patterns are to issue a <code>recv</code> after a <code>send</code> as part of a request->reply, or to block on <code>recv</code>, process the incoming message, and then loop back wait for the next message - handling messages as they come in.</p>
 
 <p>In Elixir, we have another option: letting the runtime read from the socket and deliver the data as messages to a process. This is called "active mode". Before we jump into code, note that there are possible negative implications to this feature (which we'll get to).</p>
 
@@ -53,11 +53,11 @@ end</code></pre>
   # assume the socket was initially in active: :once
   # do things with data, maybe read more bytes from socket
   :inet.setopts(socket, active: :once)
-  {:noreply state}
+  {:noreply, state}
 end</code></pre>
 
-<p>Why does <code>:once</code> exists? It's to prevent overburdening your process (especially in terms of memory usage). Remember, Elixir's process mailboxes are boundless. When a socket is in active mode, the messages will be delivered as fast as they can be - which may be faster than you can process them. By using <code>active: :once</code> you more truthfully represents your capacity to process messages to the operating system.</p>
+<p>Why does <code>:once</code> exists? It's to prevent overburdening your process (especially in terms of memory usage). Remember, Elixir's process mailboxes are boundless. When a socket is in active mode, the messages will be delivered as fast as they can be - which may be faster than you can process them. By using <code>active: :once</code> you more truthfully represents your capacity to process data to the VM and the operating system.</p>
 
 <p>(You can also specify <code>active: -32768 ..32767</code>, but that's less common and meaningless until we cover message boundaries in part 2)</p>
 
-<p>Having said that, if all your peers are well-behaved, keeping the socket in active mode has two big advantages. First, it makes your code consistent. Switching between active and passive means having to deal with two different APIs and the fact that sometimes errors (like a closed socket) will be returned sycnhronously and sometimes asynchronously. Secondly, active is faster. It let's the VM transfer data from the OS into your process in the most efficient manner and avoids constant calls to <code>:inet.setopts/2</code>. Intuitively, it makes a lot of sense that passive or once can be a lot slower: all that time you're spending processing the message is time that the OS and VM could be passing more bytes into your process (which active mode would do)</p>
+<p>Having said that, if all your peers are well-behaved, keeping the socket in active mode has two big advantages. First, it makes your code consistent. Switching between active and passive means having to deal with two different APIs and the fact that sometimes errors (like a closed socket) will be returned sycnhronously and sometimes asynchronously. Secondly, active is faster. It let's the VM transfer data from the OS into your process in the most efficient manner and avoids constant calls to <code>:inet.setopts/2</code>. Intuitively, it makes a lot of sense that passive or once can be a lot slower: all that time you're spending processing the message is time that the OS and VM could be passing more bytes into your process (which active mode does).</p>
